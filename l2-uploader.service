@@ -1,0 +1,44 @@
+[Unit]
+Description=L2-Uploader - Binance WebSocket to S3 Data Pipeline
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=%i
+Group=%i
+WorkingDirectory=/home/%i/L2-Uploader
+Environment="PATH=/home/%i/L2-Uploader/venv/bin:/usr/local/bin:/usr/bin:/bin"
+EnvironmentFile=/home/%i/L2-Uploader/.env
+
+# Use virtual environment Python
+ExecStart=/home/%i/L2-Uploader/venv/bin/python run_uploader.py
+
+# Restart configuration
+Restart=always
+RestartSec=10
+StartLimitInterval=300
+StartLimitBurst=5
+
+# Resource limits
+LimitNOFILE=65536
+MemoryMax=2G
+CPUQuota=200%
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=l2-uploader
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+
+# Graceful shutdown
+TimeoutStopSec=30
+KillMode=mixed
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=multi-user.target
+
